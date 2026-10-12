@@ -1,6 +1,7 @@
 package com.example.security;
 
 public class LoginRequest {
+
     String username;
     String password;
 

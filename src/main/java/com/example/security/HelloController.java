@@ -22,7 +22,7 @@ public class HelloController {
     @Autowired
     JwtUtils jwtUtils;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER)")
     @GetMapping("/hello")
     public String sayHello() {
         return "Hello";
@@ -32,30 +32,40 @@ public class HelloController {
     public String sayAdminHello() {
         return "Hello Admin ";
     }
+
     @GetMapping("/user/hello")
     public String sayUserHello() {
         return "Hello User";
     }
 
     @PostMapping("/signin")
-    public String login(@RequestBody LoginRequest loginRequest){
+    public String login(@RequestBody LoginRequest loginRequest) {
+
         Authentication authentication;
-        try{
-            authentication= authenticationManager.authenticate(
+
+        try {
+            authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
                             loginRequest.getPassword()
                     )
             );
-        } catch (AuthenticationException e){
+
+        } catch (AuthenticationException e) {
             e.printStackTrace();
             return "Could not authenticate";
         }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+        SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
 
-        String jwtToken=jwtUtils.generateTokenFromUserName(userDetails.getUsername());
+        UserDetails userDetails =
+                (UserDetails) authentication.getPrincipal();
+
+        String jwtToken =
+                jwtUtils.generateTokenFromUserName(
+                        userDetails
+                );
 
         return jwtToken;
     }
